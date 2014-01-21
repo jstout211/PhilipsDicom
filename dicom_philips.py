@@ -32,9 +32,7 @@ def folder_process_dicoms():
     """Select the data using a PYQT window, then loop over a dicom conversion and fix"""      
     dataset_folder= get_folder()    
     files = os.listdir(dataset_folder)
-
-def temp_proc():
-    for i in files[0:10]:
+    for i in files:
         dataset=os.path.join(dataset_folder,i)
         output_folder=os.path.join(dataset_folder, 'Processed')        
         try:
@@ -51,20 +49,14 @@ def temp_proc():
     
     
 def convert_dicom(dicom_file, output_folder):
-    """Use mcverter (from MRIConvert) to convert Dicom >> Nifti"""
-    mcverter_input="mcverter -o {0} -f {1} -j -d  -n -u -F -PatientName, PatientId, SeriesDate, SeriesTime, StudyId, StudyDescription, SeriesNumber, SequenceName, ProtocolName, SeriesDescription {2}".format(output_folder, 'fsl', dicom_file)      
+    """Use mcverter (from MRIConvert) to convert Dicom >> Nifti"""    
+    mcverter_input="mcverter -o {0} -f {1} -j -d  -n -u -q -F -PatientName,+PatientId,-SeriesDate,-SeriesTime,-StudyId,-StudyDescription,+SeriesNumber,-SequenceName,+ProtocolName,-SeriesDescription {2}".format(output_folder, 'fsl', dicom_file)      
     #mcverter_input="mcverter -o {0} -f {1} -j -d  -n -u -F PatientID {2}".format(output_folder, 'fsl', dicom_file)      
     #mcverter_input="mcverter -o {0} -f {1} -d -u -n {2} -F -SeriesDate,-SeriesTime,-SeriesDescription,-StudyID,-SeriesNumber,-SequenceName ".format(output_folder, 'fsl', dicom_file)
     os.system(mcverter_input)
     
-
-
-        try:
-            print "Dicom: ", i, " Converted successfully"
-        except:
-            pass
-
-
+folder_process_dicoms()
+    
 
 
 
