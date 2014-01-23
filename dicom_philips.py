@@ -105,14 +105,17 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
             img=nib.load(os.path.join(temp_nifti_folder,curr_nifti_file)) 
             hdr=img.get_header()
             pix_nifti=img.get_data()
-            pix_corrected=pix_nifti/slope#### Major Component of Analysis
+            pix_corrected=pix_nifti/float(slope)#### Major Component of Analysis
             output_nifti_name=curr_nifti_file.split(".")[0] + "_Corrected." + curr_nifti_file.split(".")[-1]
-            hdr.data_to_fileobj(pix_corrected, output_nifti_name)
+            #hdr.data_to_fileobj(pix_corrected, './'+output_nifti_name.__str__())
+            img2=nib.Nifti1Image(pix_corrected,img.get_affine(), header=hdr)
+            img2.to_filename(os.path.join(processed_folder,output_nifti_name))
         except:
             return Exception
                 
         
-        
+def scale_niftis(scale, nifti_data):
+    """        """
 
     
         
