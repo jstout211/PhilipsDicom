@@ -11,8 +11,13 @@ from PySide.QtGui import *
 import nibabel as nib
 #from mvpa2.suite import fmri_dataset, SampleAttributes
 
-os.chdir('/media/3T_Data1/MRI_ARCHIVE/20')
-inputs=os.listdir('.')
+"""TODO: Need to create loop for slope eval over multivolume series
+Check for multivol then perform loop
+If completion, move to Processed folder (may have been done)
+Remove 0:5 condition on main loop"""
+
+
+
 
 #%% Folder Get
 def get_folder():
@@ -47,7 +52,7 @@ def folder_process_dicoms():
         os.mkdir(error_folder); print "Made Errors Folder"    
 
     ## Main Loop for converting and fixing Dicoms (i is a single Dicom file)    
-    for i in files[0:5]:
+    for i in files[0:5]: #Remove 0:5!!!!!!!!!!!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxXXXXXXXXXXXXXXXXxxxx
         dataset=os.path.join(dataset_folder,i)      
         try:
             convert_dicom(dataset, temp_folder)
@@ -97,7 +102,7 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
 #    for curr_nifti_file in list_of_niftis:   
 #        img=nib.load(curr_nifti_file)
         
-    while list_of_niftis!=[]:   
+    while list_of_niftis!=[]:   ## Need to loop over all Volumes in Image !!!!!
         try:        
             curr_nifti_file=list_of_niftis.pop()        
             img=nib.load(os.path.join(temp_nifti_folder,curr_nifti_file)) 
