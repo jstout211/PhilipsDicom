@@ -92,9 +92,25 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
             
     ## Filter and load nifti file
     list_of_niftis = glob.fnmatch.filter(os.listdir(temp_folder),'*.nii')
+    
     ## Load Nifti File and Correct Nifti File
+#    for curr_nifti_file in list_of_niftis:   
+#        img=nib.load(curr_nifti_file)
         
-    img=nib.load()
+    while list_of_niftis!=[]:   
+        try:        
+            curr_nifti_file=list_of_niftis.pop()        
+            img=nib.load(os.path.join(temp_nifti_folder,curr_nifti_file)) 
+            hdr=img.get_header()
+            pix_nifti=img.get_data()
+            pix_corrected=pix_nifti/slope#### Major Component of Analysis
+            output_nifti_name=curr_nifti_file.split(".")[0] + "_Corrected." + curr_nifti_file.split(".")[-1]
+            hdr.data_to_fileobj(pix_corrected, output_nifti_name)
+        except:
+            return Exception
+                
+        
+        
 
     
         
