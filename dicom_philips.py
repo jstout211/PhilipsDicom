@@ -52,7 +52,7 @@ def folder_process_dicoms():
         os.mkdir(error_folder); print "Made Errors Folder"    
 
     ## Main Loop for converting and fixing Dicoms (i is a single Dicom file)    
-    for i in files[0:5]: #Remove 0:5!!!!!!!!!!!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxXXXXXXXXXXXXXXXXxxxx
+    for i in files[0:5]:
         dataset=os.path.join(dataset_folder,i)      
         try:
             convert_dicom(dataset, temp_folder)
@@ -96,13 +96,10 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
             return Exception
             
     ## Filter and load nifti file
-    list_of_niftis = glob.fnmatch.filter(os.listdir(temp_folder),'*.nii')
+    list_of_niftis = glob.fnmatch.filter(os.listdir(temp_nifti_folder),'*.nii')
     
-    ## Load Nifti File and Correct Nifti File
-#    for curr_nifti_file in list_of_niftis:   
-#        img=nib.load(curr_nifti_file)
-        
-    while list_of_niftis!=[]:   ## Need to loop over all Volumes in Image !!!!!
+    ## Load Nifti File and Correct Nifti File for curr_nifti_file in list_of_niftis: img=nib.load(curr_nifti_file)        
+    while list_of_niftis!=[]:   
         try:        
             curr_nifti_file=list_of_niftis.pop()        
             img=nib.load(os.path.join(temp_nifti_folder,curr_nifti_file)) 
@@ -132,6 +129,9 @@ folder_process_dicoms()
 
 
 
+
+
+#%%  REMVOE ALL OF BELOW
 from mvpa2.suite import *
 import nibabel as nib
 os.chdir('/home/jeff/Desktop/TempTempFile/TestFixed')
