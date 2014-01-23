@@ -13,8 +13,9 @@ import nibabel as nib
 
 """TODO: Need to create loop for slope eval over multivolume series
 Check for multivol then perform loop
-If completion, move to Processed folder (may have been done)
-Remove 0:5 condition on main loop"""
+DONE: If completion, move to Processed folder (may have been done)
+DONE: Remove 0:5 condition on main loop
+Assumption: Scale on all multivolume images is the same"""
 
 
 
@@ -52,11 +53,12 @@ def folder_process_dicoms():
         os.mkdir(error_folder); print "Made Errors Folder"    
 
     ## Main Loop for converting and fixing Dicoms (i is a single Dicom file)    
-    for i in files[0:5]:
+    for i in files: #[1:2]:
         dataset=os.path.join(dataset_folder,i)      
         try:
             convert_dicom(dataset, temp_folder)
             correct_dicom(dataset, temp_folder, output_folder)
+            flush_temp_folder(temp_folder, error_folder)
             print "Dicom Converted Successfully:\t ", i
         except:
             print "Error in Dicom Process!!: \t ", i
@@ -110,13 +112,19 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
             #hdr.data_to_fileobj(pix_corrected, './'+output_nifti_name.__str__())
             img2=nib.Nifti1Image(pix_corrected,img.get_affine(), header=hdr)
             img2.to_filename(os.path.join(processed_folder,output_nifti_name))
+            os.remove(os.path.join(temp_nifti_folder,curr_nifti_file))
         except:
             return Exception
+    
+
                 
         
-def scale_niftis(scale, nifti_data):
-    """        """
+def flush_temp_folder(temp_folder, error_folder):
+    if os.listdir(temp_folder) != []:
+        for filename in os.listdir(temp_folder):
+            shutil.move(os.path.join(temo_folder, filename), error_folder)
 
+    
     
         
 def move_to_error_folder(temp_folder, error_folder):
@@ -134,127 +142,127 @@ folder_process_dicoms()
 
 
 
-#%%  REMVOE ALL OF BELOW
-from mvpa2.suite import *
-import nibabel as nib
-os.chdir('/home/jeff/Desktop/TempTempFile/TestFixed')
-
-
-ds=dicom.read_file('IM_0005')
-pix=ds.pixel_array
-
-img=nib.load('./Test.nii')
-
-hdr=img.get_header()
-hdr.data_to_fileobj(pix,img)
-pix2=pix.swapaxes(0,2)
-
-
-
-
-
-
-
-
-
+##%%  REMVOE ALL OF BELOW
+#from mvpa2.suite import *
+#import nibabel as nib
+#os.chdir('/home/jeff/Desktop/TempTempFile/TestFixed')
+#
+#
+#ds=dicom.read_file('IM_0005')
+#pix=ds.pixel_array
+#
+#img=nib.load('./Test.nii')
+#
+#hdr=img.get_header()
+#hdr.data_to_fileobj(pix,img)
+#pix2=pix.swapaxes(0,2)
+#
+#
+#
+#
+#
+#
+#
+#
+#
+##tempvar={}
+##for i,j in enumerate(inputs):
+##    try:    
+##        ds=dicom.read_file(inputs[i])
+##        pix=ds.pixel_array
+##        if pix.shape[0] > 10:
+##            tempvar[i]=inputs[i]            
+##            #tempvar.append(inputs[i])
+##    except:
+##        print "Cant process ", inputs[i]
+##        
+##for i,z in enumerate(inputs):
+##    print i
+##    
+#    
+#    
+##%%         Find TFE SENSE
 #tempvar={}
-#for i,j in enumerate(inputs):
+#prot_name={}
+#for i,j in enumerate(inputs[0:100]):
 #    try:    
 #        ds=dicom.read_file(inputs[i])
-#        pix=ds.pixel_array
-#        if pix.shape[0] > 10:
-#            tempvar[i]=inputs[i]            
+#        prot_name[i]=ds[0x0018,0x1030].value
+#        #pix=ds.pixel_array
+#        #if pix.shape[0] > 10:
+#        #    tempvar[i]=inputs[i]            
 #            #tempvar.append(inputs[i])
 #    except:
 #        print "Cant process ", inputs[i]
 #        
 #for i,z in enumerate(inputs):
-#    print i
+#    print i, prot_name[i]
+#      
 #    
-    
-    
-#%%         Find TFE SENSE
-tempvar={}
-prot_name={}
-for i,j in enumerate(inputs[0:100]):
-    try:    
-        ds=dicom.read_file(inputs[i])
-        prot_name[i]=ds[0x0018,0x1030].value
-        #pix=ds.pixel_array
-        #if pix.shape[0] > 10:
-        #    tempvar[i]=inputs[i]            
-            #tempvar.append(inputs[i])
-    except:
-        print "Cant process ", inputs[i]
-        
-for i,z in enumerate(inputs):
-    print i, prot_name[i]
-      
-    
-    
-    
-    
-#rescale_intercept=ds[0x0028,0x1052]    
-#rescale_slope=ds[0x0028,0x1053] 
-
-output={}
-maxoutput={}
-for i,j in  enumerate(tempvar.keys()): #enumerate(tempvar):
-    #print j
-    ds=dicom.read_file(tempvar[j])
-    try:
-        slope=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1053].value
-        intercept=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1052].value
-        scale_type=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1054].value
-        output[i]=[slope,intercept,scale_type]
-    except:
-        try:
-            slope=ds[0x0028,0x1053].value
-            intercept=ds[0x0028,0x1052].value
-            scale_type=ds[0x0028,0x1054].value
-            output[i]=[slope,intercept,scale_type]
-        except:
-            output[i]=["noval","noval"]            
-    #dim=pix.shape[0]/2    
-    #imshow(pix[dim,:,:]) 
-    try: 
-        pix=ds.pixel_array
-        maxoutput[i]=pix.max()
-    except:
-        pass
-    
-for i in range(len(output)):
-    if output[i][0] != 'noval':
-        #print output[i], maxoutput[i]
-        print i, output[i][0], maxoutput[i]/output[i][0]
-    
-
-ds=dicom.read_file(inputs[4])
-
-
-#%%    
-imshow(pix[45,:,:]) 
-np.max(np.max(np.max(pix))) 
-
-
-slope=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1053].value
-intercept=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1052].value
-
-#%%
-import dicom
-from mvpa2.suite import *
-import nibabel as nib
-os.chdir('/home/jeff/Desktop/TempTempFile/TestFixed')
-
-
-ds=dicom.read_file('IM_0005')
-pix=ds.pixel_array
-
-img=nib.load('./Test.nii')
-
-hdr=img.get_header()
-hdr.data_to_fileobj(pix,img)
-pix2=pix.swapaxes(0,2)
+#    
+#    
+#    
+##rescale_intercept=ds[0x0028,0x1052]    
+##rescale_slope=ds[0x0028,0x1053] 
+#
+#output={}
+#maxoutput={}
+#for i,j in  enumerate(tempvar.keys()): #enumerate(tempvar):
+#    #print j
+#    ds=dicom.read_file(tempvar[j])
+#    try:
+#        slope=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1053].value
+#        intercept=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1052].value
+#        scale_type=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1054].value
+#        output[i]=[slope,intercept,scale_type]
+#    except:
+#        try:
+#            slope=ds[0x0028,0x1053].value
+#            intercept=ds[0x0028,0x1052].value
+#            scale_type=ds[0x0028,0x1054].value
+#            output[i]=[slope,intercept,scale_type]
+#        except:
+#            output[i]=["noval","noval"]            
+#    #dim=pix.shape[0]/2    
+#    #imshow(pix[dim,:,:]) 
+#    try: 
+#        pix=ds.pixel_array
+#        maxoutput[i]=pix.max()
+#    except:
+#        pass
+#    
+#for i in range(len(output)):
+#    if output[i][0] != 'noval':
+#        #print output[i], maxoutput[i]
+#        print i, output[i][0], maxoutput[i]/output[i][0]
+#    
+#
+#ds=dicom.read_file(inputs[4])
+#
+#
+##%%    
+#imshow(pix[45,:,:]) 
+#np.max(np.max(np.max(pix))) 
+#
+#
+#slope=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1053].value
+#intercept=ds.PerframeFunctionalGroups[0][0x2005,0x140f][0][0x0028,0x1052].value
+#
+##%%
+#import dicom
+#from mvpa2.suite import *
+#import nibabel as nib
+#os.chdir('/home/jeff/Desktop/TempTempFile/TestFixed')
+#
+#
+#ds=dicom.read_file('IM_0005')
+#pix=ds.pixel_array
+#
+#img=nib.load('./Test.nii')
+#
+#hdr=img.get_header()
+#hdr.data_to_fileobj(pix,img)
+#pix2=pix.swapaxes(0,2)
 
 #%%
    
