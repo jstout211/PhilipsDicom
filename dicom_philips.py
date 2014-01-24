@@ -116,7 +116,10 @@ def flush_temp_folder(temp_folder, error_folder):
         
 def move_to_error_folder(temp_folder, error_folder):
     temp_contents=[os.path.join(temp_folder,i) for i in os.listdir(temp_folder)]
-    [shutil.move(file, error_folder) for file in temp_contents]
+    try:
+        [shutil.move(filename, error_folder) for filename in temp_contents]
+    except: 
+        [shutil.move(filename + '1', error_folder) for filename in temp_contents]
   
 if __name__ == "__main__":
     """Runs the main loop for import.  If prompt=True, then user inputs will be given, otherwise it will autoload TBSS_Data3"""
