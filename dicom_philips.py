@@ -65,7 +65,7 @@ def folder_process_dicoms():
  
 def convert_dicom(dicom_file, output_folder):
     """Use mcverter (from MRIConvert) to convert Dicom >> Nifti"""    
-    mcverter_input="mcverter -o {0} -f {1}   -n -u -q -F -PatientName,+PatientId,-SeriesDate,-SeriesTime,-StudyId,-StudyDescription,+SeriesNumber,-SequenceName,+ProtocolName,-SeriesDescription {2}".format(output_folder, 'fsl', dicom_file)      
+    mcverter_input="mcverter -o {0} -f {1}  -d -n -u -q -F -PatientName,+PatientId,-SeriesDate,-SeriesTime,-StudyId,-StudyDescription,+SeriesNumber,-SequenceName,+ProtocolName,-SeriesDescription {2}".format(output_folder, 'fsl', dicom_file)      
     #mcverter_input="mcverter -o {0} -f {1} -j -d  -n -u -F PatientID {2}".format(output_folder, 'fsl', dicom_file)      
     #mcverter_input="mcverter -o {0} -f {1} -d -u -n {2} -F -SeriesDate,-SeriesTime,-SeriesDescription,-StudyID,-SeriesNumber,-SequenceName ".format(output_folder, 'fsl', dicom_file)
     os.system(mcverter_input)
@@ -105,7 +105,7 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
             #hdr.data_to_fileobj(pix_corrected, './'+output_nifti_name.__str__())
             img2=nib.Nifti1Image(pix_corrected,img.get_affine(), header=hdr)
             img2.to_filename(os.path.join(processed_folder,output_nifti_name))
-            os.remove(os.path.join(temp_nifti_folder,curr_nifti_file))
+            #os.remove(os.path.join(temp_nifti_folder,curr_nifti_file))
         except:
             return Exception
                        
