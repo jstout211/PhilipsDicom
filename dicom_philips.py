@@ -119,7 +119,29 @@ def move_to_error_folder(temp_folder, error_folder):
     try:
         [shutil.move(filename, error_folder) for filename in temp_contents]
     except: 
-        [shutil.move(filename + '1', error_folder) for filename in temp_contents]
+        output_names=resolve_name_conflict(temp_contents, error_folder)
+        #output_names=[os.path.join(temp_folder,i) for i in output_names]     
+        [shutil.move(filename , output) for filename,output in zip(temp_contents,output_names)]
+        #[filename, output for filename,output in zip(temp_contents,output_names)]
+        
+
+
+def resolve_name_conflict(list_filenames, conflict_folder):
+    list_filenames=[ filename.split('/')[-1]  for filename in list_filenames ]    
+    new_list_filenames=[]    
+    for filename in list_filenames:
+        if os.path.exists(os.path.join(conflict_folder, filename)):
+            testname=os.path.join(conflict_folder, filename);
+            test_var=1
+            while os.path.exists(testname):
+                testname=testname+str(test_var)
+                test_var=test_var+1
+            new_list_filenames.append(testname)
+        else:
+            new_list_filenames.append(filename)
+    return new_list_filenames
+            
+        
   
 if __name__ == "__main__":
     """Runs the main loop for import.  If prompt=True, then user inputs will be given, otherwise it will autoload TBSS_Data3"""
