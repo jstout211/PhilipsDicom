@@ -4,7 +4,7 @@ Created on Fri Jan 17 11:46:11 2014
 
 @author: jeff
 """
-import dicom, sys, os, shutil, glob
+import dicom, sys, os, shutil, glob, re
 from PySide.QtCore import *
 from PySide.QtGui import *
 #from mvpa2.suite import *
@@ -51,8 +51,9 @@ def folder_process_dicoms():
     if not os.path.exists(error_folder):
         os.mkdir(error_folder); print "Made Errors Folder"    
 
-    ## Main Loop for converting and fixing Dicoms (i is a single Dicom file)    
-    for i in files: #[1:2]:
+    ## Main Loop for converting and fixing Dicoms (i is a single Dicom file)  
+    error_list=[]
+    for i in files: #[0:100]: #[1:2]:
         dataset=os.path.join(dataset_folder,i)      
         try:
             convert_dicom(dataset, temp_folder)
@@ -61,6 +62,7 @@ def folder_process_dicoms():
             print "Dicom Converted and Corrected Successfully:\t ", i
         except:
             print "Error in Dicom Process!!: \t ", i
+            error_list.append(i)
             move_to_error_folder(temp_folder, error_folder)
  
 def convert_dicom(dicom_file, output_folder):
@@ -91,6 +93,7 @@ def correct_dicom(dicom_file, temp_nifti_folder, processed_folder):
             return Exception
             
     ## Filter and load nifti file
+    list_of_niftis = []
     list_of_niftis = glob.fnmatch.filter(os.listdir(temp_nifti_folder),'*.nii')
     
     ## Load Nifti File and Correct Nifti File for curr_nifti_file in list_of_niftis: img=nib.load(curr_nifti_file)        
@@ -121,21 +124,24 @@ def move_to_error_folder(temp_folder, error_folder):
     except: 
         output_names=resolve_name_conflict(temp_contents, error_folder)
         #output_names=[os.path.join(temp_folder,i) for i in output_names]     
-        [shutil.move(filename , output) for filename,output in zip(temp_contents,output_names)]
+        [shutil.move(filename2 , output) for filename2,output in zip(temp_contents,output_names)]       
         #[filename, output for filename,output in zip(temp_contents,output_names)]
         
 
-
+## This resolve name conflict function does not work optimally.
 def resolve_name_conflict(list_filenames, conflict_folder):
-    list_filenames=[ filename.split('/')[-1]  for filename in list_filenames ]    
+    list_filenames=[ filename2.split('/')[-1]  for filename2 in list_filenames ]    
     new_list_filenames=[]    
     for filename in list_filenames:
         if os.path.exists(os.path.join(conflict_folder, filename)):
-            testname=os.path.join(conflict_folder, filename);
+            testname=os.path.join(conflict_folder, filename)
             test_var=1
             while os.path.exists(testname):
-                testname=testname+str(test_var)
-                test_var=test_var+1
+                if int(re.split(r'(\d+)',testname)[-2]):
+                    testname=''.join(re.split(r'(\d+)',testname)[:-2]) + str(int(re.split(r'(\d+)',testname)[-2])+1)
+                else:
+                    testname=testname+str(1)
+                #test_var=test_var+1
             new_list_filenames.append(testname)
         else:
             new_list_filenames.append(filename)
