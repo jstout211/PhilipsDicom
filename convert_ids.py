@@ -12,8 +12,11 @@ from PySide.QtGui import *
 import pickle
 
 class FileConvert:
+    """During Initialization it creates a dictionary of medical ID keys 
+    with MEGID values"""     
     def __init__(self):
         self.files=[]
+        self.medid_dict=self.create_medid_dictionary()
         
     def _get_folder(self):
         """Retrieve Folder using QT file browser"""    
@@ -42,16 +45,39 @@ class FileConvert:
         for filename in files:
             output=[]
             med_id=[]
+            tbis=[]
+            non_tbis=[]
             #print 'Current: ', i    
             output=re.search(patfinder,filename)
             if output != None:
                 med_id=output.group()
-                self.convert_name(filename, med_id)
+                meg_id=self.convert_name(filename, med_id)
+                if meg_id == "NOT_TBI":
+                    non_tbis.append(filename)
+                else:
+                    tbis.append(meg_id+filename[output.end():])
+                    print med_id, meg_id+filename[output.end():]
                 
                 
     def convert_name(self,filename, med_id):
-        print filename, med_id
-        os.
+        """Input MedId and outputs MEG_ID >> else returns NOT_TBI"""        
+        try:
+            return self.medid_dict[med_id][1]
+        except:
+            return "NOT_TBI"
+
+    def create_medid_dictionary(self):
+        medid_dict={}
+        import csv
+        with open('/media/Data_3T_D1/Functions/PhilipsDicom/PhilipsDicom/MedID_List.csv','rb') as csvfile:
+            reader=csv.reader(csvfile)
+            for row in reader:
+                medid_dict[row[3]]=row[0:4]
+        return medid_dict
+                
+        
+
+        
         
             
             
