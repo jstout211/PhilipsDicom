@@ -56,7 +56,7 @@ class FileConvert:
                     non_tbis.append(filename)
                 else:
                     tbis.append(meg_id+filename[output.end():])
-                    print med_id, meg_id+filename[output.end():]
+                    print med_id, meg_id+filename[output.end():], self.return_scan_type(filename)                  
                 
                 
     def convert_name(self,filename, med_id):
@@ -74,7 +74,29 @@ class FileConvert:
             for row in reader:
                 medid_dict[row[3]]=row[0:4]
         return medid_dict
-                
+        
+    def return_scan_type(self,filename):
+        if re.search('DTI',filename):
+            return 'DTI'
+        elif re.search('3D_TFE_SENSE', filename):
+            return 'T1'
+        elif re.search('fMRI_VERB_GENERATION', filename):
+            return 'VERB_GEN'
+        elif re.search('fMRI_WORD_GENERATION_SENSE', filename):
+            return 'WORD_GEN'            
+        elif re.search('252_fMRI_FLANKER_ARROW_SENSE', filename):
+            return 'FLANKER_ARROW'  
+        elif re.search('Resting_fMRI_FLANKER_ARROW_SENSE', filename):
+            return 'REST' 
+        elif re.search('fMRI_N-BACK_SENSE', filename):
+            return 'NBACK'
+        elif re.search('FLAIR_AXIAL__T2W_FLAIR', filename):
+            return 'FLAIR'            
+        else:
+            return filename
+
+        
+
         
 
         
