@@ -22,10 +22,13 @@ for i in scanlist:
 
 class FileConvert:
     """During Initialization it creates a dictionary of medical ID keys 
-    with MEGID values"""     
-    def __init__(self):
+    with MEGID values
+    useage: FileConvert(top_folder=[])"""     
+    def __init__(self,top_folder=[]):
         self.files=[]
         self.medid_dict=self.create_medid_dictionary()
+        self.top_folder=top_folder
+        print self.top_folder
         
     def _get_folder(self):
         """Retrieve Folder using QT file browser"""    
@@ -48,7 +51,10 @@ class FileConvert:
         """Uses Gui to identify folder and pull list of files.  
         This performs a template match to a medical ID number M"9-12 digits"
         This then calls a dictionary to lookup the MEGSubjectID"""
-        top_folder=self._get_folder()
+        if self.top_folder ==[]:
+            top_folder=self._get_folder()
+        else:
+            top_folder = self.top_folder
         files=os.listdir(top_folder)   
         pattern = 'M\d{9,12}'
         patfinder=re.compile(pattern) 

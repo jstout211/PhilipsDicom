@@ -155,6 +155,8 @@ if __name__ == "__main__":
     """Runs the main loop for import.  If prompt=True, then user inputs will be given, otherwise it will autoload TBSS_Data3"""
     #output_dataset = main(prompt = True)
     output_processed_folder = folder_process_dicoms()
+    conversion_object=convert_ids.FileConvert(top_folder=output_processed_folder)
+    conversion_object.identify_medid()
     
 
 
