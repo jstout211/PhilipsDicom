@@ -9,6 +9,7 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 #from mvpa2.suite import *
 import nibabel as nib
+from PhilipsDicom import convert_ids
 #from mvpa2.suite import fmri_dataset, SampleAttributes
 
 """TODO: Need to create loop for slope eval over multivolume series
@@ -64,6 +65,7 @@ def folder_process_dicoms():
             print "Error in Dicom Process!!: \t ", i
             error_list.append(i)
             move_to_error_folder(temp_folder, error_folder)
+    return output_folder
  
 def convert_dicom(dicom_file, output_folder):
     """Use mcverter (from MRIConvert) to convert Dicom >> Nifti"""    
@@ -152,6 +154,7 @@ def resolve_name_conflict(list_filenames, conflict_folder):
 if __name__ == "__main__":
     """Runs the main loop for import.  If prompt=True, then user inputs will be given, otherwise it will autoload TBSS_Data3"""
     #output_dataset = main(prompt = True)
-    output_dataset = folder_process_dicoms()
+    output_processed_folder = folder_process_dicoms()
+    
 
 
